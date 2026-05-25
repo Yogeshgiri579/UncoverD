@@ -1,0 +1,6 @@
+services:
+  - type: static
+    name: cosmic-skins-cases
+    env: node
+    buildCommand: npm install && npm run build
+    publishDirectory: dist
