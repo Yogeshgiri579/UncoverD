@@ -109,3 +109,57 @@ export const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
   const users = await User.find().select("-password").sort({ createdAt: -1 });
   res.json(users);
 });
+
+// Safe admin creation for initial setup (requires SETUP_TOKEN)
+export const createAdminUser = asyncHandler(async (req: Request, res: Response) => {
+  const setupToken = req.headers.authorization?.replace("Bearer ", "");
+  const expectedToken = process.env.SETUP_TOKEN;
+
+  if (!expectedToken) {
+    res.status(500);
+    throw new Error("SETUP_TOKEN is not configured");
+  }
+
+  if (setupToken !== expectedToken) {
+    res.status(401);
+    throw new Error("Invalid setup token");
+  }
+
+  // Check if admin already exists
+  const adminExists = await User.findOne({ role: "admin" });
+  if (adminExists) {
+    res.status(403);
+    throw new Error("Admin user already exists. This endpoint is no longer available.");
+  }
+
+  const { firstName, lastName, email, password } = req.body;
+
+  if (!firstName || !lastName || !email || !password) {
+    res.status(400);
+    throw new Error("Please provide firstName, lastName, email, and password");
+  }
+
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    res.status(400);
+    throw new Error("User already exists with this email");
+  }
+
+  const user = await User.create({
+    firstName,
+    lastName,
+    email,
+    password,
+    role: "admin",
+  });
+
+  res.status(201).json({
+    _id: user._id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    role: user.role,
+    token: generateToken(user._id.toString()),
+    message: "Admin user created successfully",
+  });
+});

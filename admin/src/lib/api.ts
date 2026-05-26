@@ -75,3 +75,23 @@ export async function getOrder(id: string) {
 export async function getAllUsers() {
   return apiRequest("/auth/admin/all-users");
 }
+
+// Admin creation with setup token
+export async function createAdminUser(data: {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  setupToken: string;
+}) {
+  return apiRequest("/auth/admin/create", {
+    method: "POST",
+    body: {
+      firstName: data.firstName,
+      lastName: data.lastName,
+      email: data.email,
+      password: data.password,
+    },
+    token: data.setupToken, // Pass setup token as Bearer token
+  });
+}

@@ -102,6 +102,12 @@ function LoginPage() {
             <p className="mt-6 text-center text-xs text-muted-foreground">
               Use your admin account credentials to sign in.
             </p>
+            <p className="mt-3 text-center text-xs">
+              First time setting up?{" "}
+              <Link to="/setup" className="text-primary hover:underline font-medium">
+                Create admin account
+              </Link>
+            </p>
           </CardContent>
         </Card>
       </div>
