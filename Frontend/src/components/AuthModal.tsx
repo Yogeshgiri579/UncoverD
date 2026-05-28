@@ -15,34 +15,38 @@ const AuthModal = ({ open, onClose, onAuthSuccess }: AuthModalProps) => {
   const [showPass, setShowPass] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+
+  // Reset form fields when switching between signin / signup
+  const switchMode = (next: "signin" | "signup") => {
+    setMode(next);
+    setEmail(""); setPassword(""); setFirstName(""); setLastName("");
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
       if (mode === "signup") {
-        if (!fullName.trim()) {
-          throw new Error("Please enter your full name");
-        }
-
-        const names = fullName.trim().split(/\s+/);
-        const firstName = names.shift() || "";
-        // If user enters only one name, use it for lastName as well to satisfy backend requirement
-        const lastName = names.length > 0 ? names.join(" ") : firstName;
-
-        if (!email.trim() || !password) {
-          throw new Error("Email and password are required");
-        }
+        if (!firstName.trim()) throw new Error("Please enter your first name");
+        if (!lastName.trim()) throw new Error("Please enter your last name");
+        if (!email.trim()) throw new Error("Email is required");
+        if (!password) throw new Error("Password is required");
 
         const response = await apiRequest("/auth/register", {
           method: "POST",
-          body: { firstName, lastName, email: email.trim(), password },
+          body: {
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
+            email: email.trim(),
+            password,
+          },
         });
 
         onAuthSuccess(response.token);
         onClose();
-        toast.success("Signup successful. You are now logged in.");
+        toast.success("Account created! You are now signed in.");
         return;
       }
 
@@ -87,15 +91,27 @@ const AuthModal = ({ open, onClose, onAuthSuccess }: AuthModalProps) => {
 
             <form className="space-y-4" onSubmit={handleSubmit}>
               {mode === "signup" && (
-                <div>
-                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Full Name</label>
-                  <input
-                    type="text"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className="mt-1 w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-sm outline-none focus:ring-1 focus:ring-primary transition-shadow"
-                    placeholder="Enter your name"
-                  />
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">First Name</label>
+                    <input
+                      type="text"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      className="mt-1 w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-sm outline-none focus:ring-1 focus:ring-primary transition-shadow"
+                      placeholder="First name"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Last Name</label>
+                    <input
+                      type="text"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      className="mt-1 w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-sm outline-none focus:ring-1 focus:ring-primary transition-shadow"
+                      placeholder="Last name"
+                    />
+                  </div>
                 </div>
               )}
               <div>
@@ -136,7 +152,7 @@ const AuthModal = ({ open, onClose, onAuthSuccess }: AuthModalProps) => {
             <p className="text-center text-sm text-muted-foreground mt-4">
               {mode === "signin" ? "Don't have an account?" : "Already have an account?"}{" "}
               <button
-                onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+                onClick={() => switchMode(mode === "signin" ? "signup" : "signin")}
                 className="text-primary hover:underline font-medium"
               >
                 {mode === "signin" ? "Sign Up" : "Sign In"}

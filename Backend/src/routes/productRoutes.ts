@@ -7,25 +7,16 @@ import {
   deleteProduct,
   getProductStats,
 } from "../controllers/productController";
-import { protect } from "../middlewares/authMiddleware";
+import { protect, adminOnly } from "../middlewares/authMiddleware";
 
 const router = express.Router();
 
-// Admin only middleware
-const adminOnly = (req: any, res: any, next: any) => {
-  if (req.user.role !== "admin") {
-    res.status(403);
-    throw new Error("Not authorized as admin");
-  }
-  next();
-};
-
-// Public routes
+// ─── Public Routes ─────────────────────────────────────────────────────────
 router.get("/", getAllProducts);
 router.get("/stats", getProductStats);
 router.get("/:id", getProductById);
 
-// Admin routes
+// ─── Admin-Only Routes ────────────────────────────────────────────────────
 router.post("/", protect, adminOnly, createProduct);
 router.put("/:id", protect, adminOnly, updateProduct);
 router.delete("/:id", protect, adminOnly, deleteProduct);

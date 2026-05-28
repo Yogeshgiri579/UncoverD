@@ -1,23 +1,28 @@
 import express from "express";
-import { registerUser, loginUser, getCurrentUser, getUserProfile, getAllUsers, createAdminUser } from "../controllers/authController";
-import { protect } from "../middlewares/authMiddleware";
+import {
+  registerUser,
+  loginUser,
+  adminLogin,
+  getCurrentUser,
+  getUserProfile,
+  getAllUsers,
+} from "../controllers/authController";
+import { protect, adminOnly } from "../middlewares/authMiddleware";
 
 const router = express.Router();
 
-// Admin only middleware
-const adminOnly = (req: any, res: any, next: any) => {
-  if (req.user.role !== "admin") {
-    res.status(403);
-    throw new Error("Not authorized as admin");
-  }
-  next();
-};
-
+// ─── Public Routes ─────────────────────────────────────────────────────────
 router.post("/register", registerUser);
 router.post("/login", loginUser);
-router.post("/admin/create", createAdminUser); // Safe admin creation with SETUP_TOKEN
+
+// ─── Admin Auth (dedicated endpoint) ──────────────────────────────────────
+router.post("/admin/login", adminLogin);
+
+// ─── Protected Routes (any logged-in user) ────────────────────────────────
 router.get("/me", protect, getCurrentUser);
 router.get("/profile", protect, getUserProfile);
-router.get("/admin/all-users", protect, adminOnly, getAllUsers);
+
+// ─── Admin-Only Routes ────────────────────────────────────────────────────
+router.get("/admin/users", protect, adminOnly, getAllUsers);
 
 export default router;

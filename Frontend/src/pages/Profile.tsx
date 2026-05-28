@@ -41,6 +41,13 @@ interface ProfileProps {
   onLogout?: () => void;
 }
 
+const formatName = (first?: string, last?: string) => {
+  if (!first) return last || "Unknown";
+  if (!last) return first;
+  if (first.toLowerCase() === last.toLowerCase()) return first;
+  return `${first} ${last}`;
+};
+
 const Profile = ({ onLogout }: ProfileProps) => {
   const navigate = useNavigate();
   const { items: cartItems } = useCart();
@@ -116,7 +123,7 @@ const Profile = ({ onLogout }: ProfileProps) => {
               </div>
               <div>
                 <p className="text-sm uppercase text-muted-foreground">Welcome back</p>
-                <h1 className="text-2xl font-semibold text-foreground">{profile.firstName} {profile.lastName}</h1>
+                <h1 className="text-2xl font-semibold text-foreground">{formatName(profile.firstName, profile.lastName)}</h1>
               </div>
             </div>
 

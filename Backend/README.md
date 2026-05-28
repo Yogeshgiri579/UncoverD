@@ -5,7 +5,9 @@ A Node.js + Express + MongoDB backend scaffold for auth, checkout, PayU payment,
 ## Setup
 
 1. Copy `.env.example` to `.env`
-2. Fill in `MONGO_URI`, `JWT_SECRET`, PayU and Shiprocket credentials
+2. Fill in `MONGO_URI`, `JWT_SECRET`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD`.
+   - Optional: `ADMIN_FIRST_NAME` and `ADMIN_LAST_NAME` for the backend admin account.
+   - If the env admin account does not exist in the database yet, it will be created automatically on first login.
 3. Install dependencies:
    ```bash
    npm install

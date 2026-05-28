@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, redirect, useNavigate } from "@tanstack/react-router";
+import { Outlet, Navigate, useNavigate } from "react-router-dom";
 import { Bell, Search, LogOut } from "lucide-react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/admin-sidebar";
@@ -6,24 +6,17 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-export const Route = createFileRoute("/admin")({
-  // ── Auth guard: runs BEFORE the component renders ────────────────────────
-  // This prevents any flash of the dashboard before redirect.
-  beforeLoad: () => {
-    const token = localStorage.getItem("adminToken");
-    if (!token) {
-      throw redirect({ to: "/login" });
-    }
-  },
-  component: AdminLayout,
-});
-
-function AdminLayout() {
+export default function AdminLayout() {
   const navigate = useNavigate();
+  const token = localStorage.getItem("adminToken");
+
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
 
   const handleLogout = () => {
     localStorage.removeItem("adminToken");
-    navigate({ to: "/login" });
+    navigate("/login", { replace: true });
   };
 
   return (

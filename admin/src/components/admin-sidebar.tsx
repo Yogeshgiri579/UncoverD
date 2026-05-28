@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Package,
@@ -30,7 +30,9 @@ const items = [
 ];
 
 export function AdminSidebar() {
-  const path = useRouterState({ select: (s) => s.location.pathname });
+  const location = useLocation();
+  const path = location.pathname;
+  
   const isActive = (url: string) =>
     url === "/admin" ? path === "/admin" : path.startsWith(url);
 

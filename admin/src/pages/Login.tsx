@@ -1,5 +1,5 @@
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Boxes, Lock, Mail, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,24 +7,20 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { adminLogin } from "@/lib/api";
 
-export const Route = createFileRoute("/login")({
-  // If already logged in → redirect to dashboard before component mounts
-  beforeLoad: () => {
-    const token = localStorage.getItem("adminToken");
-    if (token) {
-      throw redirect({ to: "/admin" });
-    }
-  },
-  component: LoginPage,
-});
-
-function LoginPage() {
+export default function LoginPage() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("adminToken");
+    if (token) {
+      navigate("/admin", { replace: true });
+    }
+  }, [navigate]);
 
   const validate = (): string | null => {
     if (!email.trim()) return "Email is required";
@@ -47,11 +43,9 @@ function LoginPage() {
 
     setLoading(true);
     try {
-      // Hits POST /api/auth/admin/login — only succeeds for role=admin accounts
       const data = await adminLogin(email.trim(), password);
-
       localStorage.setItem("adminToken", data.token);
-      navigate({ to: "/admin" });
+      navigate("/admin", { replace: true });
     } catch (err: unknown) {
       const msg =
         err instanceof Error

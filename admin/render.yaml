@@ -11,7 +11,7 @@ services:
             value: "public, max-age=0, must-revalidate"
     envVars:
       - key: VITE_API_BASE_URL
-        value: https://uncoverd.onrender.com/api
+        value: https://uncover-d-backend.onrender.com/api
     routes:
       - type: rewrite
         source: "/*"
